@@ -1,4 +1,5 @@
 ﻿using LibraryManagement.BLL.AuthorManagement.Dtos;
+using LibraryManagement.BLL.Exceptions;
 using LibraryManagement.DAL.AuthorManagement.Repositories;
 using LibraryManagement.Models;
 
@@ -43,6 +44,23 @@ public class AuthorService : IAuthorService
 
     public async Task AddAuthorAsync(AuthorDto model)
     {
+        // Validate FullName format (four names with min 2 chars each)
+        if (!HaveFourNamesWithMinTwoChars(model.FullName))
+        {
+            throw new ValidationException(nameof(model.FullName), "Full name must consist of four names, each at least 2 characters long.");
+        }
+
+        // Validate uniqueness
+        if (await _authorRepository.ExistsByFullnameAsync(model.FullName))
+        {
+            throw new ValidationException(nameof(model.FullName), "Full name must be unique.");
+        }
+
+        if (await _authorRepository.ExistsByEmailAsync(model.Email))
+        {
+            throw new ValidationException(nameof(model.Email), "Email must be unique.");
+        }
+
         var author = new Author
         {
             FullName = model.FullName,
@@ -54,11 +72,32 @@ public class AuthorService : IAuthorService
         await _authorRepository.AddAsync(author);
     }
 
+    private bool HaveFourNamesWithMinTwoChars(string fullName)
+    {
+        var names = fullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return names is { Length: 4 } && names.All(n => n.Length >= 2);
+    }
+
+
     public async Task UpdateAuthorAsync(int id, AuthorDto model)
     {
         var existingAuthor = await _authorRepository.GetByIdAsync(id);
-        if (existingAuthor == null) return;
+        if (existingAuthor == null)
+            throw new Exception("Author not found");
 
+        // ✅ Validate full name structure
+        var names = model.FullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (names is not { Length: 4 } || names.Any(n => n.Length < 2))
+            throw new ValidationException(nameof(model.FullName), "Full name must consist of four names, each at least 2 characters long.");
+
+        // ✅ Check uniqueness — exclude current record
+        if (await _authorRepository.ExistsByFullnameAsync(model.FullName) && model.FullName != existingAuthor.FullName)
+            throw new ValidationException(nameof(model.FullName), "Full name must be unique.");
+
+        if (await _authorRepository.ExistsByEmailAsync(model.Email) && model.Email != existingAuthor.Email)
+            throw new ValidationException(nameof(model.Email), "Email must be unique.");
+
+        // ✅ Update values
         existingAuthor.FullName = model.FullName;
         existingAuthor.Email = model.Email;
         existingAuthor.Website = model.Website;
@@ -66,6 +105,7 @@ public class AuthorService : IAuthorService
 
         await _authorRepository.UpdateAsync(existingAuthor);
     }
+
 
     public async Task DeleteAuthorAsync(int id)
     {

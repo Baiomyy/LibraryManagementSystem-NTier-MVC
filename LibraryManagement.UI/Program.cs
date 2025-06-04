@@ -1,3 +1,6 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using LibraryManagement.BLL.AuthorManagement.Validators;
 using LibraryManagement.BLL.Extensions;
 using LibraryManagement.DAL.Extensions;
 using LibraryManagement.DAL.Persistence;
@@ -16,6 +19,11 @@ namespace LibraryManagement.UI
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddValidatorsFromAssemblyContaining<AuthorValidator>();
+
 
             var app = builder.Build();
 

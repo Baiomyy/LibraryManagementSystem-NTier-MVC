@@ -1,0 +1,56 @@
+﻿@using LibraryManagement.BLL.AuthorManagement.Dtos
+@{
+    ViewData["Title"] = "Authors";
+    var authors = ViewBag.Authors as List<AuthorDto>;
+}
+
+<h2>Authors</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Add New Author</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Bio</th>
+            @* <th>Books Count</th> *@
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (authors != null && authors.Any())
+        {
+            foreach (var author in authors)
+            {
+                <tr>
+                    <td>@author.FullName</td>
+                    <td>@author.Email</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(author.Website))
+                        {
+                            <a href="@author.Website" target="_blank">
+                                @author.Website
+                            </a>
+                        }
+                    </td>
+                    <td>@(author.Bio?.Length > 50 ? author.Bio.Substring(0, 50) + "..." : author.Bio)</td>
+                    @* <td>@(author.Books?.Count() ?? 0)</td> *@
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@author.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@author.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No authors found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
