@@ -1,0 +1,36 @@
+﻿@model IEnumerable<LibraryManagement.BLL.BookManagement.Dtos.BookDto>
+
+@{
+    ViewData["Title"] = "Books List";
+}
+
+<h2>Books</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Book</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Author</th>
+            <th></th>  <!-- For Edit/Delete actions -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Genre</td>
+                <td>@book.AuthorFullName</td> <!-- Assuming your BookDto has AuthorFullName property -->
+                <td>
+                    <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

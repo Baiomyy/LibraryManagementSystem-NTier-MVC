@@ -2,11 +2,6 @@
 
 namespace LibraryManagement.Models;
 
-public enum Genre
-{
-    Unknown, Adventure, Mystery, Thriller, Romance, SciFi, Fantasy,
-    Biography, History, SelfHelp, Children, YoungAdult, Poetry, Drama, NonFiction
-}
 public class Book
 {
     public int Id { get; set; }
