@@ -1,0 +1,68 @@
+﻿@model IEnumerable<LibraryManagement.BLL.BookTransactionManagement.Dtos.BookTransactionDto>
+
+@{
+	ViewData["Title"] = "Book Transactions";
+	var selectedStatus = ViewContext.HttpContext.Request.Query["status"].ToString();
+	var borrowDate = ViewContext.HttpContext.Request.Query["borrowDate"].ToString();
+	var returnDate = ViewContext.HttpContext.Request.Query["returnDate"].ToString();
+}
+
+<h2>Book Transactions</h2>
+
+<form method="get" class="mb-3">
+	<div class="row g-2">
+		<div class="col-md-3">
+			<select name="status" class="form-select">
+				<option value="">All Status</option>
+				<option value="available" selected="@(selectedStatus == "available")">Available</option>
+				<option value="borrowed" selected="@(selectedStatus == "borrowed")">Borrowed</option>
+			</select>
+		</div>
+		<div class="col-md-3">
+			<input type="date" name="borrowDate" value="@borrowDate" class="form-control" placeholder="Borrow Date" />
+		</div>
+		<div class="col-md-3">
+			<input type="date" name="returnDate" value="@returnDate" class="form-control" placeholder="Return Date" />
+		</div>
+		<div class="col-md-3">
+			<button type="submit" class="btn btn-primary">Filter</button>
+			<a href="@Url.Action("Index")" class="btn btn-secondary">Reset</a>
+		</div>
+	</div>
+</form>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Book Title</th>
+			<th>Status</th>
+			<th>Borrowed Date</th>
+			<th>Returned Date</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var tx in Model)
+		{
+			<tr>
+				<td>@tx.BookTitle</td>
+				<td>@(tx.IsReturned ? "Available" : "Borrowed")</td>
+				<td>@tx.BorrowedDate.ToString("yyyy-MM-dd")</td>
+				<td>@(tx.ReturnedDate.HasValue ? tx.ReturnedDate.Value.ToString("yyyy-MM-dd") : "-")</td>
+				<td>
+					@if (!tx.IsReturned)
+					{
+						<form asp-action="Return" method="post" style="display:inline;">
+							<input type="hidden" name="transactionId" value="@tx.Id" />
+							<button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Return this book?');">Return</button>
+						</form>
+					}
+					else
+					{
+						<a href="@Url.Action("Borrow", "BookTransaction", new { bookId = tx.BookId })" class="btn btn-sm btn-primary">Borrow</a>
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

@@ -1,5 +1,6 @@
 ﻿using LibraryManagement.DAL.AuthorManagement.Repositories;
 using LibraryManagement.DAL.BookManagement.Repositories;
+using LibraryManagement.DAL.BookTransactionManagement.Repositories;
 using LibraryManagement.DAL.Persistence;
 using LibraryManagement.DAL.Seeders;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public static class ServiceCollectionExtensions
         // Register repositories
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<IBookRepository, BookRepository>();
+        services.AddScoped<IBookTransactionRepository, BookTransactionRepository>();
 
         return services;
 

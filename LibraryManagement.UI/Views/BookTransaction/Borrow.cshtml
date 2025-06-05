@@ -1,0 +1,24 @@
+﻿@model LibraryManagement.BLL.BookTransactionManagement.Dtos.BorrowBookDto
+
+@{
+    ViewData["Title"] = "Borrow Book";
+}
+
+<h2>Borrow Book</h2>
+
+<div>
+    <h4>@Model.BookTitle</h4>
+</div>
+
+<form asp-action="Borrow" method="post">
+    <input type="hidden" asp-for="BookId" />
+
+    <div class="mb-3">
+        <label>Borrow Date</label>
+        <input type="text" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" disabled />
+        <small class="form-text text-muted">The borrow date will be set automatically to now.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Confirm Borrow</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
