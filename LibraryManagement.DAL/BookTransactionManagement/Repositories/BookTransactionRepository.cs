@@ -59,10 +59,13 @@ public class BookTransactionRepository : IBookTransactionRepository
         _context = context;
     }
 
-    public async Task<List<BookTransaction>> GetAllWithBooksAsync()
+    public async Task<List<BookTransaction>> GetAllWithBooksAsync(int pageNumber, int pageSize)
     {
         return await _context.BookTransactions
             .Include(t => t.Book)
+            .OrderByDescending(t => t.BorrowedDate)  // Optional: order by date descending
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
 
@@ -94,4 +97,34 @@ public class BookTransactionRepository : IBookTransactionRepository
         _context.BookTransactions.Update(transaction);
         await _context.SaveChangesAsync();
     }
+
+    // BookTransactionRepository.cs
+    public async Task<(List<BookTransaction> Transactions, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, string? status, DateTime? borrowDate, DateTime? returnDate)
+    {
+        var query = _context.BookTransactions.Include(t => t.Book).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = status == "borrowed"
+                ? query.Where(x => !x.ReturnedDate.HasValue)
+                : query.Where(x => x.ReturnedDate.HasValue);
+        }
+
+        if (borrowDate.HasValue)
+            query = query.Where(x => x.BorrowedDate.Date == borrowDate.Value.Date);
+
+        if (returnDate.HasValue)
+            query = query.Where(x => x.ReturnedDate.HasValue && x.ReturnedDate.Value.Date == returnDate.Value.Date);
+
+        var totalCount = await query.CountAsync();
+
+        var transactions = await query
+            .OrderByDescending(x => x.BorrowedDate)  // optional ordering
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (transactions, totalCount);
+    }
+
 }

@@ -2,9 +2,15 @@
 
 @{
 	ViewData["Title"] = "Book Transactions";
+
 	var selectedStatus = ViewContext.HttpContext.Request.Query["status"].ToString();
 	var borrowDate = ViewContext.HttpContext.Request.Query["borrowDate"].ToString();
 	var returnDate = ViewContext.HttpContext.Request.Query["returnDate"].ToString();
+
+	var totalCount = (int)ViewData["TotalCount"];
+	var pageNumber = (int)ViewData["PageNumber"];
+	var pageSize = (int)ViewData["PageSize"];
+	var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 }
 
 <h2>Book Transactions</h2>
@@ -13,9 +19,11 @@
 	<div class="row g-2">
 		<div class="col-md-3">
 			<select name="status" class="form-select">
-				<option value="">All Status</option>
-				<option value="available" selected="@(selectedStatus == "available")">Available</option>
-				<option value="borrowed" selected="@(selectedStatus == "borrowed")">Borrowed</option>
+				<option value="" selected="@(string.IsNullOrEmpty(selectedStatus) ? "selected" : null)">All Status</option>
+				<option value="available" selected="@(selectedStatus == "available" ? "selected" : null)">Available</option>
+				<option value="borrowed" selected="@(selectedStatus == "borrowed" ? "selected" : null)">Borrowed</option>
+
+
 			</select>
 		</div>
 		<div class="col-md-3">
@@ -66,3 +74,22 @@
 		}
 	</tbody>
 </table>
+
+<nav>
+	<ul class="pagination justify-content-center">
+		<li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+			<a class="page-link" href="@Url.Action("Index", new { status = selectedStatus, borrowDate, returnDate, pageNumber = pageNumber - 1 })">Previous</a>
+		</li>
+
+		@for (int i = 1; i <= totalPages; i++)
+		{
+			<li class="page-item @(pageNumber == i ? "active" : "")">
+				<a class="page-link" href="@Url.Action("Index", new { status = selectedStatus, borrowDate, returnDate, pageNumber = i })">@i</a>
+			</li>
+		}
+
+		<li class="page-item @(pageNumber == totalPages ? "disabled" : "")">
+			<a class="page-link" href="@Url.Action("Index", new { status = selectedStatus, borrowDate, returnDate, pageNumber = pageNumber + 1 })">Next</a>
+		</li>
+	</ul>
+</nav>

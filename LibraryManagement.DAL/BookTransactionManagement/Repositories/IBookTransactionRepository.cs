@@ -13,7 +13,7 @@ namespace LibraryManagement.DAL.BookTransactionManagement.Repositories;
 
 public interface IBookTransactionRepository
 {
-    Task<List<BookTransaction>> GetAllWithBooksAsync();
+    Task<List<BookTransaction>> GetAllWithBooksAsync(int pageNumber, int pageSize);
 
     Task<BookTransaction?> GetLatestTransactionForBookAsync(int bookId);
 
@@ -22,4 +22,7 @@ public interface IBookTransactionRepository
     Task AddAsync(BookTransaction transaction);
 
     Task ReturnBookAsync(BookTransaction transaction);
+    
+    Task<(List<BookTransaction> Transactions, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, string? status, DateTime? borrowDate, DateTime? returnDate);
+
 }

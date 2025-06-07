@@ -96,12 +96,21 @@ public class BookTransactionController : Controller
         _bookService = bookService;
     }
 
-    // GET: BookTransaction
-    public async Task<IActionResult> Index(string? status, DateTime? borrowDate, DateTime? returnDate)
+    //GET: BookTransaction
+    public async Task<IActionResult> Index(string? status, DateTime? borrowDate, DateTime? returnDate, int pageNumber = 1)
     {
-        var transactions = await _transactionService.GetAllAsync(status, borrowDate, returnDate);
+        int pageSize = 10;  
+        var (transactions, totalCount) = await _transactionService.GetPagedAsync(pageNumber, pageSize, status, borrowDate, returnDate);
+
+        ViewData["TotalCount"] = totalCount;
+        ViewData["PageNumber"] = pageNumber;
+        ViewData["PageSize"] = pageSize;
+
         return View(transactions);
     }
+
+
+
 
     // GET: BookTransaction/Borrow?bookId=1
     [HttpGet]

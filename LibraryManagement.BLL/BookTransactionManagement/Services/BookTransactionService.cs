@@ -81,9 +81,10 @@ public class BookTransactionService : IBookTransactionService
         _repo = repo;
     }
 
-    public async Task<List<BookTransactionDto>> GetAllAsync(string? status, DateTime? borrowDate, DateTime? returnDate)
+    public async Task<List<BookTransactionDto>> GetAllAsync(string? status, DateTime? borrowDate, DateTime? returnDate, int pageNumber, int pageSize)
     {
-        var data = await _repo.GetAllWithBooksAsync();
+        // For simplicity, fetch all data for filtering first or you can apply filters in repo for better performance (optional improvement)
+        var data = await _repo.GetAllWithBooksAsync(pageNumber, pageSize);
 
         if (!string.IsNullOrWhiteSpace(status))
         {
@@ -107,6 +108,7 @@ public class BookTransactionService : IBookTransactionService
             ReturnedDate = x.ReturnedDate
         }).ToList();
     }
+
 
     public async Task<BookTransactionDto?> GetTransactionByBookIdAsync(int bookId)
     {
@@ -147,4 +149,22 @@ public class BookTransactionService : IBookTransactionService
 
         await _repo.ReturnBookAsync(tx);
     }
+
+    
+    public async Task<(List<BookTransactionDto> Transactions, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, string? status, DateTime? borrowDate, DateTime? returnDate)
+    {
+        var (transactions, totalCount) = await _repo.GetPagedAsync(pageNumber, pageSize, status, borrowDate, returnDate);
+
+        var dtos = transactions.Select(x => new BookTransactionDto
+        {
+            Id = x.Id,
+            BookId = x.BookId,
+            BookTitle = x.Book.Title,
+            BorrowedDate = x.BorrowedDate,
+            ReturnedDate = x.ReturnedDate
+        }).ToList();
+
+        return (dtos, totalCount);
+    }
+
 }
