@@ -52,5 +52,20 @@ public class AuthorRepository : IAuthorRepository
     {
         return await _context.Authors.AnyAsync(a => a.FullName == fullname);
     }
+
+    public async Task<(List<Author>, int totalCount)> GetPagedAuthorsAsync(int page, int pageSize)
+    {
+        var totalCount = await _context.Authors.CountAsync();
+
+        var authors = await _context.Authors
+            .AsNoTracking()
+            .OrderBy(a => a.FullName) // Optional: order by FullName
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (authors, totalCount);
+    }
+
 }
 

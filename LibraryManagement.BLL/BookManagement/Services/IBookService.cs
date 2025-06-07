@@ -9,4 +9,5 @@ public interface IBookService
     Task AddBookAsync(BookDto model);
     Task UpdateBookAsync(BookDto model);
     Task DeleteBookAsync(int id);
+    Task<(List<BookDto> Books, int TotalCount)> GetBooksPagedAsync(int pageNumber, int pageSize);
 }

@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Books List";
+
+    int currentPage = ViewBag.PageNumber ?? 1;  
+    int totalPages = ViewBag.TotalPages ?? 1;
 }
 
 <h2>Books</h2>
@@ -25,7 +28,7 @@
             <tr>
                 <td>@book.Title</td>
                 <td>@book.Genre</td>
-                <td>@book.AuthorFullName</td> <!-- Assuming your BookDto has AuthorFullName property -->
+                <td>@book.AuthorFullName</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-warning">Edit</a>
                     <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-sm btn-danger">Delete</a>
@@ -34,3 +37,22 @@
         }
     </tbody>
 </table>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(currentPage - 1)">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(currentPage + 1)">Next</a>
+        </li>
+    </ul>
+</nav>

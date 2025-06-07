@@ -8,19 +8,29 @@ namespace LibraryManagement.UI.Controllers
     public class AuthorController : Controller
     {
         private readonly IAuthorService _authorService;
+        
 
         public AuthorController(IAuthorService authorService)
         {
             _authorService = authorService;
         }
 
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    var authors = await _authorService.GetAllAuthorsAsync();
+        //    ViewBag.Authors = authors;
+        //    return View(authors);
+        //}
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var authors = await _authorService.GetAllAuthorsAsync();
-            ViewBag.Authors = authors;
+            var (authors, totalCount) = await _authorService.GetPagedAuthorsAsync(page, pageSize);
+
+            ViewBag.TotalCount = totalCount;
+            ViewBag.PageSize = pageSize;
+            ViewBag.CurrentPage = page;
+
             return View(authors);
         }
-
         public IActionResult Create()
         {
             return View();

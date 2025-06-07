@@ -1,7 +1,14 @@
 ﻿@using LibraryManagement.BLL.AuthorManagement.Dtos
+@model List<AuthorDto>
+
 @{
     ViewData["Title"] = "Authors";
-    var authors = ViewBag.Authors as List<AuthorDto>;
+
+    int totalCount = ViewBag.TotalCount ?? 0;
+    int pageSize = ViewBag.PageSize ?? 5;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+
+    int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 }
 
 <h2>Authors</h2>
@@ -17,14 +24,13 @@
             <th>Email</th>
             <th>Website</th>
             <th>Bio</th>
-            @* <th>Books Count</th> *@
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @if (authors != null && authors.Any())
+        @if (Model != null && Model.Any())
         {
-            foreach (var author in authors)
+            foreach (var author in Model)
             {
                 <tr>
                     <td>@author.FullName</td>
@@ -32,13 +38,10 @@
                     <td>
                         @if (!string.IsNullOrEmpty(author.Website))
                         {
-                            <a href="@author.Website" target="_blank">
-                                @author.Website
-                            </a>
+                            <a href="@author.Website" target="_blank">@author.Website</a>
                         }
                     </td>
                     <td>@(author.Bio?.Length > 50 ? author.Bio.Substring(0, 50) + "..." : author.Bio)</td>
-                    @* <td>@(author.Books?.Count() ?? 0)</td> *@
                     <td>
                         <a asp-action="Edit" asp-route-id="@author.Id" class="btn btn-sm btn-warning">Edit</a>
                         <a asp-action="Delete" asp-route-id="@author.Id" class="btn btn-sm btn-danger">Delete</a>
@@ -49,8 +52,30 @@
         else
         {
             <tr>
-                <td colspan="6" class="text-center">No authors found.</td>
+                <td colspan="5" class="text-center">No authors found.</td>
             </tr>
         }
     </tbody>
 </table>
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize">Previous</a>
+            </li>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@pageSize">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

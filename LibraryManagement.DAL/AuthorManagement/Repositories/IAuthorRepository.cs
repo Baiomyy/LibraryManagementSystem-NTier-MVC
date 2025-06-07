@@ -11,4 +11,6 @@ public interface IAuthorRepository
     Task DeleteAsync(Author author);
     Task<bool> ExistsByEmailAsync(string email);
     Task<bool> ExistsByFullnameAsync(string fullname);
+    Task<(List<Author>, int totalCount)> GetPagedAuthorsAsync(int page, int pageSize);
+
 }

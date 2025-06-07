@@ -124,5 +124,22 @@ public class AuthorService : IAuthorService
     {
         return await _authorRepository.ExistsByFullnameAsync(fullname);
     }
+
+    public async Task<(List<AuthorDto>, int totalCount)> GetPagedAuthorsAsync(int page, int pageSize)
+    {
+        var (authors, totalCount) = await _authorRepository.GetPagedAuthorsAsync(page, pageSize);
+
+        var authorDtos = authors.Select(a => new AuthorDto
+        {
+            Id = a.Id,
+            FullName = a.FullName,
+            Email = a.Email,
+            Website = a.Website,
+            Bio = a.Bio
+        }).ToList();
+
+        return (authorDtos, totalCount);
+    }
+
 }
 

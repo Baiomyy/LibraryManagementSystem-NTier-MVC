@@ -4,6 +4,7 @@ using LibraryManagement.DAL.AuthorManagement.Repositories;
 using LibraryManagement.Models;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.BLL.BookManagement.Services;
+using LibraryManagement.BLL.Helpers;
 
 public class BookService : IBookService
 {
@@ -90,4 +91,38 @@ public class BookService : IBookService
 
         await _bookRepository.DeleteAsync(book);
     }
+
+    public async Task<(List<BookDto> Books, int TotalCount)> GetBooksPagedAsync(int pageNumber, int pageSize)
+    {
+        var books = await _bookRepository.GetPagedAsync(pageNumber, pageSize);
+        var totalCount = await _bookRepository.GetTotalCountAsync();
+
+        var bookDtos = books.Select(b => new BookDto
+        {
+            Id = b.Id,
+            Title = b.Title,
+            Genre = b.Genre,
+            AuthorFullName = b.Author.FullName,
+            Description = b.Description,
+        }).ToList();
+
+        return (bookDtos, totalCount);
+    }
+    //public async Task<PaginatedList<BookDto>> GetBooksPagedAsync(int pageNumber, int pageSize)
+    //{
+    //    var query = _context.Books
+    //        .Include(b => b.Author) // if needed
+    //        .OrderBy(b => b.Title)
+    //        .Select(b => new BookDto
+    //        {
+    //            Id = b.Id,
+    //            Title = b.Title,
+    //            Genre = b.Genre,
+    //            AuthorFullName = b.Author.FullName
+    //        });
+
+    //    return await PaginatedList<BookDto>.CreateAsync(query, pageNumber, pageSize);
+    //}
+
+
 }

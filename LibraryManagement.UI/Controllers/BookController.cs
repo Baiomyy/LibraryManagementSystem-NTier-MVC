@@ -16,11 +16,23 @@ public class BookController : Controller
         _authorService = authorService;
     }
 
-    public async Task<IActionResult> Index()
+    //public async Task<IActionResult> Index()
+    //{
+    //    var books = await _bookService.GetAllBooksAsync();
+    //    return View(books);
+    //}
+    public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
     {
-        var books = await _bookService.GetAllBooksAsync();
+        var (books, totalCount) = await _bookService.GetBooksPagedAsync(pageNumber, pageSize);
+
+        ViewBag.PageNumber = pageNumber; 
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
         return View(books);
     }
+
+
 
     public async Task<IActionResult> Create()
     {

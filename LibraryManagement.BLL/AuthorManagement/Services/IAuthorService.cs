@@ -11,4 +11,6 @@ public interface IAuthorService
     Task DeleteAuthorAsync(int id);
     Task<bool> AuthorExistsByEmail(string email);
     Task<bool> AuthorExistsByFullname(string fullname);
+    Task<(List<AuthorDto>, int totalCount)> GetPagedAuthorsAsync(int page, int pageSize);
+
 }

@@ -41,5 +41,22 @@ namespace LibraryManagement.DAL.BookManagement.Repositories
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Book>> GetPagedAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Books
+                .Include(b => b.Author) 
+                .OrderBy(b => b.Title)  
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.Books.CountAsync();
+        }
+
     }
 }
